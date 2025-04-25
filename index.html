@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Embed Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .embed-code {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            background-color: #f1f1f1;
+        }
+        .embed-container img {
+            width: 100%;
+            max-width: 100%;
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Upload and Embed Image</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="image" id="image" class="file-input" accept="image/*" required />
+            <button type="submit" class="file-input">Upload Image</button>
+        </form>
+
+        <div id="embedContainer" style="display: none;">
+            <h2>Image URL:</h2>
+            <input type="text" id="imageUrl" class="embed-code" readonly>
+
+            <h2>Embed Code:</h2>
+            <textarea id="embedCode" class="embed-code" readonly></textarea>
+
+            <div class="embed-container">
+                <h3>Preview:</h3>
+                <img id="imagePreview" src="" alt="Image Preview">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const embedCode = document.getElementById('embedCode');
+        const embedContainer = document.getElementById('embedContainer');
+
+        // Handle the image upload form
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();  // Prevent default form submission
+
+            const formData = new FormData(uploadForm);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const imageUrl = data.imageUrl;  // The full URL of the uploaded image
+
+                // Display the uploaded image preview
+                imagePreview.src = imageUrl;
+                imagePreview.style.display = 'block';
+
+                // Display the image URL
+                imageUrlInput.value = imageUrl;
+
+                // Display the embed code
+                embedCode.value = data.embedCode;
+
+                // Show embed container
+                embedContainer.style.display = 'block';
+            })
+            .catch(error => {
+                alert('An error occurred while uploading the image.');
+            });
+        });
+    </script>
+
+</body>
+</html>
